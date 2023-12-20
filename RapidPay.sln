@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RapidPay.API", "RapidPay.API\RapidPay.API.csproj", "{0BB7084E-CBC3-4F82-AD4D-29B3322B6B7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RapidPay.Domain", "RapidPay.Domain\RapidPay.Domain.csproj", "{02FC91A3-AA9A-43D7-8BA0-D55223D0D780}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RapidPay.Model", "RapidPay.Model\RapidPay.Model.csproj", "{3FB30069-F694-49EA-8F89-71235DBE0129}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RapidPay.Repository", "RapidPay.Repository\RapidPay.Repository.csproj", "{E6885B6A-0E34-46F7-9FAB-344E98DCAF68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BB7084E-CBC3-4F82-AD4D-29B3322B6B7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BB7084E-CBC3-4F82-AD4D-29B3322B6B7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BB7084E-CBC3-4F82-AD4D-29B3322B6B7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BB7084E-CBC3-4F82-AD4D-29B3322B6B7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02FC91A3-AA9A-43D7-8BA0-D55223D0D780}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02FC91A3-AA9A-43D7-8BA0-D55223D0D780}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02FC91A3-AA9A-43D7-8BA0-D55223D0D780}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02FC91A3-AA9A-43D7-8BA0-D55223D0D780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FB30069-F694-49EA-8F89-71235DBE0129}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FB30069-F694-49EA-8F89-71235DBE0129}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FB30069-F694-49EA-8F89-71235DBE0129}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FB30069-F694-49EA-8F89-71235DBE0129}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6885B6A-0E34-46F7-9FAB-344E98DCAF68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6885B6A-0E34-46F7-9FAB-344E98DCAF68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6885B6A-0E34-46F7-9FAB-344E98DCAF68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6885B6A-0E34-46F7-9FAB-344E98DCAF68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {16A637B3-1C79-4474-B3EF-E103FF381ACD}
+	EndGlobalSection
+EndGlobal
