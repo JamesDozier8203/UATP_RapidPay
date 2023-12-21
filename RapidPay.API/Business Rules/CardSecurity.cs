@@ -22,4 +22,10 @@ public class CardSecurity : ICardSecurity
     {
         return _unitOfWork.CreditCardRepository.CheckFundsAvailable(cardNumber, amount) == null ? false : true;
     }
+
+    public async Task<Guid> Authenticate(AuthenticateModel authenticateModel)
+    {
+        return await _unitOfWork.CreditCardRepository.GetCardIdByCardNumberPinCode(authenticateModel.CardNumber, authenticateModel.PinCode);
+    }
+    
 }

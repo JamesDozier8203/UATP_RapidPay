@@ -59,4 +59,14 @@ public class CreditCardRepository : GenericRepository<CreditCard>, ICreditCardRe
                                      .Select(x => x)
                                      .FirstOrDefaultAsync();
     }
+
+    public async Task<Guid> GetCardIdByCardNumberPinCode(string cardNumber, string pinCode)
+    {
+        var card = await table.Where(c => c.CardNumber.Equals(cardNumber)
+                                   && c.PinCode.Equals(pinCode))
+                                     .Select(x => x)
+                                     .FirstOrDefaultAsync();
+        
+        return card == null ? Guid.Empty : card.Id;
+    }
 }

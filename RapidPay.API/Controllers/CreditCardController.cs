@@ -6,9 +6,16 @@ using RapidPay.Repository.Helpers;
 using RapidPay.Model;
 using AutoMapper;
 using RapidPay.API.Business_Rules;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace RapidPay.API.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class CreditCardController : BaseController
@@ -16,16 +23,20 @@ public class CreditCardController : BaseController
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly ICardSecurity _cardSecurity;
+    private readonly AppSettings _appSettings;
 
     public CreditCardController(IUnitOfWork unitOfWork,
                                 IMapper mapper,
-                                ICardSecurity cardSecurity)
+                                ICardSecurity cardSecurity, 
+                                IOptions<AppSettings> appSettings)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _cardSecurity = cardSecurity;
+        _appSettings = appSettings.Value;
     }
 
+    [AllowAnonymous]
     [HttpPost()]
     private async Task<IActionResult> Create(CreditCardModel creditCardModel)
     {
@@ -43,6 +54,35 @@ public class CreditCardController : BaseController
         return Ok(complete);
     }
 
+    [AllowAnonymous]
+    [HttpPost("authenticate")]
+    public async Task<IActionResult> Authenticate(AuthenticateModel authenticateModel)
+    {
+        Guid id = await _cardSecurity.Authenticate(authenticateModel);
+
+        if (id == Guid.Empty)
+            return BadRequest(new { message = "Username or password is incorrect" });
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new Claim[]
+            {
+                    new Claim(ClaimTypes.Name, id.ToString())
+            }),
+            Expires = DateTime.UtcNow.AddDays(7),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        var tokenString = tokenHandler.WriteToken(token);
+
+        // return authentication token
+        return Ok(new
+        {
+            AuthToken = tokenString
+        });
+    }
 
     [HttpPut()]
     private async Task<IActionResult> Update(CreditCardModel creditCardModel)
@@ -96,7 +136,7 @@ public class CreditCardController : BaseController
         #endregion
 
 
-        var creditCard = await _unitOfWork.CreditCardRepository.GetByIdAsync(id);
+        var creditCard = await _unitOfWork.CreditCardRepository.GetByIdAsync(_id);
         await _unitOfWork.Complete();
 
         if (creditCard == null)
@@ -159,6 +199,7 @@ public class CreditCardController : BaseController
         creditCardUpdate.Balance = creditCardUpdate.Balance - transactionModel.Amount;
         await _unitOfWork.CreditCardRepository.Update(creditCardUpdate, creditCardUpdate.Id);
 
+        //commit all db transactions to the database
         await _unitOfWork.Complete();
 
         return Ok();

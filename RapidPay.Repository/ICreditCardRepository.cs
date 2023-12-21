@@ -10,5 +10,6 @@ public interface ICreditCardRepository: IGenericRepository<CreditCard>
     Task<bool> GetValidCard(CreditCard creditCard);
     Task<bool> CheckFundsAvailable(string cardNumber, decimal amount);
     Task<CreditCard> GetCardByCardNumber(string cardNumber);
+    Task<Guid> GetCardIdByCardNumberPinCode(string cardNumber, string pinCode);
 }
 
