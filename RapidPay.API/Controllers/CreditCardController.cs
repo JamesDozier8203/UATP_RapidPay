@@ -131,7 +131,7 @@ public class CreditCardController : BaseController
     }
 
     [HttpPost("pay")]
-    public async Task<IActionResult> Pay(CreditCardModel creditCardModel, PaymentModel paymentModel)
+    public async Task<IActionResult> Pay(CreditCardModel creditCardModel, TransactionModel transactionModel)
     {
         //I'm keeping this as simple as I can. I can go full blast with this payment section, but will stick to demostrating coding skills and not so much business acumen.
         
@@ -147,16 +147,21 @@ public class CreditCardController : BaseController
             return BadRequest(new { message = "Card Invalid!" });
 
         //check if funds available in account balance
-        if (!_cardSecurity.IsFundsAvailable(creditCard.CardNumber, paymentModel.Amount))
+        if (!_cardSecurity.IsFundsAvailable(creditCard.CardNumber, transactionModel.Amount))
             return BadRequest(new { message = "Insufficient Funds!" });
 
         //pay to account. create payment transaction
-
+        var transaction = _mapper.Map<Transaction>(transactionModel);
+        await _unitOfWork.TransactionRepository.InsertAsync(transaction);
 
         //deduct from account balance
+        var creditCardUpdate = await _unitOfWork.CreditCardRepository.GetCardByCardNumber(creditCardModel.CardNumber);
+        creditCardUpdate.Balance = creditCardUpdate.Balance - transactionModel.Amount;
+        await _unitOfWork.CreditCardRepository.Update(creditCardUpdate, creditCardUpdate.Id);
 
+        await _unitOfWork.Complete();
 
-        return null;
+        return Ok();
     }
 
 

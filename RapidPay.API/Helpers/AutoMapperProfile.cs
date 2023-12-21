@@ -10,5 +10,8 @@ public class AutoMapperProfile : Profile
     {
         CreateMap<CreditCard, CreditCardModel>().ReverseMap();
         CreateMap<CreditCard, CreditCardModel>();
+
+        CreateMap<Transaction, TransactionModel>().ReverseMap();
+        CreateMap<Transaction, TransactionModel>();
     }
 }

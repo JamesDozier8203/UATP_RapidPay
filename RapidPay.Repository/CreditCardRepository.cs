@@ -42,13 +42,21 @@ public class CreditCardRepository : GenericRepository<CreditCard>, ICreditCardRe
 
     public async Task<bool> CheckFundsAvailable(string cardNumber, decimal amount)
     {
-        var cardId = await table.Where(c => c.CardNumber == cardNumber
+        var cardId = await table.Where(c => c.CardNumber.Equals(cardNumber)
                                            && c.Balance >= amount)
                                      .Select(x => new
                                      {
                                          x.Id
-                                     }).FirstOrDefaultAsync();
+                                     })
+                                     .FirstOrDefaultAsync();
 
         return cardId == null ? false : true;
+    }
+
+    public async Task<CreditCard> GetCardByCardNumber(string cardNumber)
+    {
+        return await table.Where(c => c.CardNumber.Equals(cardNumber))
+                                     .Select(x => x)
+                                     .FirstOrDefaultAsync();
     }
 }
