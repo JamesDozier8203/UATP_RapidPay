@@ -23,9 +23,9 @@ public class CreditCardRepository : GenericRepository<CreditCard>, ICreditCardRe
                 cardInfo == null ? 0 : cardInfo.Balance);
     }
 
-    public async Task<(Guid)> GetValidCard(CreditCard creditCard)
+    public async Task<bool> GetValidCard(CreditCard creditCard)
     {
-        var cardId = await table.Where(c => c.CardNumber == creditCardNumber 
+        var cardId = await table.Where(c => c.CardNumber.Equals(creditCard.CardNumber)
                                            && c.CardNumber.Length == 15
                                            && c.CardHolderName.Equals(creditCard.CardHolderName)
                                            && c.CardType == creditCard.CardType
@@ -37,10 +37,10 @@ public class CreditCardRepository : GenericRepository<CreditCard>, ICreditCardRe
                                          x.Id
                                      }).FirstOrDefaultAsync();
 
-        return cardId;
+        return cardId == null ? false : true;
     }
 
-    public async Task<(Guid)> CheckFundsAvailable(string cardNumber, decimal amount)
+    public async Task<bool> CheckFundsAvailable(string cardNumber, decimal amount)
     {
         var cardId = await table.Where(c => c.CardNumber == cardNumber
                                            && c.Balance >= amount)
@@ -49,6 +49,6 @@ public class CreditCardRepository : GenericRepository<CreditCard>, ICreditCardRe
                                          x.Id
                                      }).FirstOrDefaultAsync();
 
-        return cardId;
+        return cardId == null ? false : true;
     }
 }

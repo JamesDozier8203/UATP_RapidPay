@@ -1,4 +1,6 @@
-﻿namespace RapidPay.API.Business_Rules;
+﻿using RapidPay.Domain;
+
+namespace RapidPay.API.Business_Rules;
 
 public interface ICardSecurity
 {

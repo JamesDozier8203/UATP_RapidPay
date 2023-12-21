@@ -148,7 +148,7 @@ public class CreditCardController : BaseController
 
         //check if funds available in account balance
         if (!_cardSecurity.IsFundsAvailable(creditCard.CardNumber, paymentModel.Amount))
-            return BadRequest(new { message = "Insufficient Funds!});
+            return BadRequest(new { message = "Insufficient Funds!" });
 
         //pay to account. create payment transaction
 
