@@ -1,8 +1,13 @@
+using Microsoft.Extensions.Configuration;
 using RapidPay.API.Business_Rules;
 using RapidPay.API.Middleware;
 using RapidPay.Domain;
 using RapidPay.Repository;
 using RapidPay.Repository.Helpers;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using RapidPay.API.Helpers;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +22,46 @@ services.AddSwaggerGen();
 //database service
 services.AddDbContext<DataContext>();
 services.AddCors();
+
+
+//add jwy authentication security
+// configure strongly typed settings objects
+var appSettingsSection = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
+
+// configure jwt authentication
+var key = Encoding.ASCII.GetBytes(appSettingsSection.Secret);
+services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.Events = new JwtBearerEvents
+    {
+        OnTokenValidated = context =>
+        {
+            var cardRepo = context.HttpContext.RequestServices.GetRequiredService<ICreditCardRepository>();
+            var cardId = Guid.Parse(context.Principal.Identity.Name);
+            var card = cardRepo.GetByIdAsync(cardId);
+            if (card == null)
+            {
+                // return unauthorized if user no longer exists
+                context.Fail("Unauthorized");
+            }
+            return Task.CompletedTask;
+        }
+    };
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
+});
 
 //add dependencies
 services.AddScoped<ICreditCardRepository, CreditCardRepository>();
