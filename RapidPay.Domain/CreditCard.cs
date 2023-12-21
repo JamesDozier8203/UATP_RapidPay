@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 public class CreditCard
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; }
     public decimal Balance { get; set; } = 0;
     public string CardNumber { get; set; }
     public string CardHolderName { get; set; }
@@ -14,5 +14,5 @@ public class CreditCard
     public int ExpiryYear { get; set; }
     public string SecurityCode { get; set; }
     public string PinCode { get; set; }
-    public DateTime DateTimeCreated { get; set; } = DateTime.Now;
+    public DateTime DateTimeCreated { get; } = DateTime.Now;
 }

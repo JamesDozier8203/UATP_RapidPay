@@ -5,6 +5,7 @@ using RapidPay.Domain;
 using RapidPay.Repository.Helpers;
 using RapidPay.Model;
 using AutoMapper;
+using RapidPay.API.Business_Rules;
 
 namespace RapidPay.API.Controllers;
 
@@ -14,12 +15,15 @@ public class CreditCardController : BaseController
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly ICardSecurity _cardSecurity;
 
     public CreditCardController(IUnitOfWork unitOfWork,
-                                IMapper mapper)
+                                IMapper mapper,
+                                ICardSecurity cardSecurity)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _cardSecurity = cardSecurity;
     }
 
     [HttpPost()]
@@ -111,6 +115,12 @@ public class CreditCardController : BaseController
             return BadRequest(new { message = GetErrors() });
         #endregion
 
+        /*
+         * Advice: Here I would a seperate validation and authentication method to do the following.
+         * 1. Check if Card exists by card number
+         * 2. Check if user is authorized to check balance with Pin Code 
+         */
+
         var cardResult = await _unitOfWork.CreditCardRepository.GetBalance(creditCardBalanceModel.CardNumber, creditCardBalanceModel.PinCode);
         await _unitOfWork.Complete();
 
@@ -119,6 +129,37 @@ public class CreditCardController : BaseController
         else
             return Ok(cardResult.Item2);
     }
+
+    [HttpPost("pay")]
+    public async Task<IActionResult> Pay(CreditCardModel creditCardModel, PaymentModel paymentModel)
+    {
+        //I'm keeping this as simple as I can. I can go full blast with this payment section, but will stick to demostrating coding skills and not so much business acumen.
+        
+        #region Validation
+        if (!ModelState.IsValid)
+            return BadRequest(new { message = GetErrors() });
+        #endregion
+
+        var creditCard = _mapper.Map<CreditCard>(creditCardModel);
+
+        //validate card
+        if(!_cardSecurity.IsCardValid(creditCard))
+            return BadRequest(new { message = "Card Invalid!" });
+
+        //check if funds available in account balance
+        if (!_cardSecurity.IsFundsAvailable(creditCard.CardNumber, paymentModel.Amount))
+            return BadRequest(new { message = "Insufficient Funds!});
+
+        //pay to account. create payment transaction
+
+
+        //deduct from account balance
+
+
+        return null;
+    }
+
+
 
     [HttpGet("list")]
     public async Task<IEnumerable<CreditCardModel>> List()

@@ -22,4 +22,33 @@ public class CreditCardRepository : GenericRepository<CreditCard>, ICreditCardRe
         return (cardInfo == null? "" : cardInfo.CardNumber,
                 cardInfo == null ? 0 : cardInfo.Balance);
     }
+
+    public async Task<(Guid)> GetValidCard(CreditCard creditCard)
+    {
+        var cardId = await table.Where(c => c.CardNumber == creditCardNumber 
+                                           && c.CardNumber.Length == 15
+                                           && c.CardHolderName.Equals(creditCard.CardHolderName)
+                                           && c.CardType == creditCard.CardType
+                                           && c.ExpiryMonth == creditCard.ExpiryMonth
+                                           && c.ExpiryYear == creditCard.ExpiryYear
+                                           && c.SecurityCode == creditCard.SecurityCode)
+                                     .Select(x => new
+                                     {
+                                         x.Id
+                                     }).FirstOrDefaultAsync();
+
+        return cardId;
+    }
+
+    public async Task<(Guid)> CheckFundsAvailable(string cardNumber, decimal amount)
+    {
+        var cardId = await table.Where(c => c.CardNumber == cardNumber
+                                           && c.Balance >= amount)
+                                     .Select(x => new
+                                     {
+                                         x.Id
+                                     }).FirstOrDefaultAsync();
+
+        return cardId;
+    }
 }

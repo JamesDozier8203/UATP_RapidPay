@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 public class CreditCardModel
 {
+    public Guid Id{ get; }
 
     [Required(ErrorMessage = "Balance is required!")]
     [DataType("decimal(18,5)")]
@@ -35,6 +36,4 @@ public class CreditCardModel
     [Required(ErrorMessage = "Pin Code is required!")]
     [RegularExpression("([0-9]+)", ErrorMessage = "Numbers only!")]
     public string? PinCode { get; set; }
-
-    public DateTime DateTimeCreated { get; set; } = DateTime.Now;
 }
