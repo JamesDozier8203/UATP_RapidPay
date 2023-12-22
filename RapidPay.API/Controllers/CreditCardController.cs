@@ -64,7 +64,7 @@ public class CreditCardController : BaseController
         Guid id = await _cardSecurity.Authenticate(authenticateModel);
 
         if (id == Guid.Empty)
-            return BadRequest(new { message = "Username or password is incorrect" });
+            return BadRequest(new { message = "Card Number or Pin Code is incorrect" });
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
