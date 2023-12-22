@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 public class Transaction
 {
     [Key]
-    public Guid Id { get; }
+    public Guid Id { get; set; }
     public decimal Amount { get; set; } = 0;
     public string AccountName { get; set; }
     public DateTime DateTimeCreated { get; } = DateTime.Now;

@@ -17,10 +17,12 @@ public class DataContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     => options.UseSqlServer
         (
-            configuration.GetConnectionString("RapidPay_Database")
+            configuration.GetConnectionString("RapidPay_Database"),
+            m => m.MigrationsAssembly("RapidPay.API")
         );
 
     public DbSet<CreditCard> CreditCard { get; set; }
+    public DbSet<Transaction> Transaction { get; set; }
 
 }
 

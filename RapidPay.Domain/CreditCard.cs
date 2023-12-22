@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 public class CreditCard
 {
     [Key]
-    public Guid Id { get; }
+    public Guid Id { get; set; }
     public decimal Balance { get; set; } = 0;
     public string CardNumber { get; set; }
     public string CardHolderName { get; set; }
