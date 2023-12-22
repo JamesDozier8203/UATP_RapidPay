@@ -41,7 +41,7 @@ public class CreditCardController : BaseController
 
     [AllowAnonymous]
     [HttpPost()]
-    private async Task<IActionResult> Create(CreditCardModel creditCardModel)
+    public async Task<IActionResult> Create(CreditCardModel creditCardModel)
     {
         #region Validation
         if (!ModelState.IsValid)
@@ -88,7 +88,7 @@ public class CreditCardController : BaseController
     }
 
     [HttpPut()]
-    private async Task<IActionResult> Update(CreditCardModel creditCardModel)
+    public async Task<IActionResult> Update(CreditCardModel creditCardModel)
     {
         #region Validation
         if (!ModelState.IsValid)
@@ -105,7 +105,7 @@ public class CreditCardController : BaseController
     }
 
     [HttpDelete()]
-    private async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(string id)
     {
         #region Validation
         if (string.IsNullOrEmpty(id))
@@ -159,7 +159,7 @@ public class CreditCardController : BaseController
         #endregion
 
         /*
-         * Advice: Here I would a seperate validation and authentication method to do the following.
+         * Note: Here I would a seperate validation and authentication method to do the following.
          * 1. Check if Card exists by card number
          * 2. Check if user is authorized to check balance with Pin Code 
          */
@@ -174,7 +174,7 @@ public class CreditCardController : BaseController
     }
 
     [HttpPost("pay")]
-    public async Task<IActionResult> Pay(CreditCardModel creditCardModel, TransactionModel transactionModel)
+    public async Task<IActionResult> Pay(PaymentModel paymentModel)
     {
         //I'm keeping this as simple as I can. I can go full blast with this payment section, but will stick to demostrating coding skills and not so much business acumen.
         
@@ -183,27 +183,27 @@ public class CreditCardController : BaseController
             return BadRequest(new { message = GetErrors() });
         #endregion
 
-        var creditCard = _mapper.Map<CreditCard>(creditCardModel);
+        var creditCard = _mapper.Map<CreditCard>(paymentModel.CreditCardModel);
 
         //validate card
         if(!_cardSecurity.IsCardValid(creditCard))
             return BadRequest(new { message = "Card Invalid!" });
 
         //check if funds available in account balance
-        if (!_cardSecurity.IsFundsAvailable(creditCard.CardNumber, transactionModel.Amount))
+        if (!_cardSecurity.IsFundsAvailable(creditCard.CardNumber, paymentModel.TransactionModel.Amount))
             return BadRequest(new { message = "Insufficient Funds!" });
 
         //calculate fee amount
-        decimal feeAmount = _uFESingleton.CalculateUFEPrice(transactionModel.Amount);
+        decimal feeAmount = _uFESingleton.CalculateUFEPrice(paymentModel.TransactionModel.Amount);
         _ = decimal.Round(feeAmount, 2, MidpointRounding.AwayFromZero);
 
         //pay to account. create payment transaction
-        var transaction = _mapper.Map<Transaction>(transactionModel);
+        var transaction = _mapper.Map<Transaction>(paymentModel.TransactionModel);
         transaction.Amount += feeAmount;
         await _unitOfWork.TransactionRepository.InsertAsync(transaction);
 
         //deduct from account balance
-        var creditCardUpdate = await _unitOfWork.CreditCardRepository.GetCardByCardNumber(creditCardModel.CardNumber);
+        var creditCardUpdate = await _unitOfWork.CreditCardRepository.GetCardByCardNumber(paymentModel.CreditCardModel.CardNumber);
         creditCardUpdate.Balance = creditCardUpdate.Balance - transaction.Amount;
         await _unitOfWork.CreditCardRepository.Update(creditCardUpdate, creditCardUpdate.Id);
 

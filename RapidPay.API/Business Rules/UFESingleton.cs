@@ -7,7 +7,7 @@ public class UFESingleton
     private int hour;
     private decimal fee;
     
-    private UFESingleton() { }
+    public UFESingleton() { }
 
     public static UFESingleton Instance
     {
