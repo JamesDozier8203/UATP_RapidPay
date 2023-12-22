@@ -6,8 +6,8 @@ public class TransactionModel
 {
 
     [Required(ErrorMessage = "Amount is required!")]
-    [DataType("decimal(18,5)")]
-    public decimal Amount { get; set; } = 0;
+    [DataType("decimal(18,2)")]
+    public decimal Amount { get; set; }
 
     [Required(ErrorMessage = "Account Name is required!")]
     public string? AccountName{ get; set; }

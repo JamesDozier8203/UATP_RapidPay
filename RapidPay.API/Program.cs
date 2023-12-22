@@ -67,6 +67,7 @@ services.AddAuthentication(x =>
 services.AddScoped<ICreditCardRepository, CreditCardRepository>();
 services.AddScoped<ITransactionRepository, TransactionRepository>();
 services.AddScoped<ICardSecurity, CardSecurity>();
+services.AddSingleton<UFESingleton>();
 services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();

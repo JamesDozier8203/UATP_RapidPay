@@ -7,8 +7,8 @@ public class CreditCardModel
     public Guid Id{ get; }
 
     [Required(ErrorMessage = "Balance is required!")]
-    [DataType("decimal(18,5)")]
-    public decimal Balance { get; set; } = 0;
+    [DataType("decimal(18,2)")]
+    public decimal Balance { get; set; }
 
     [Required(ErrorMessage = "Card Number is required!")]
     [MaxLengthAttribute(length: 15, ErrorMessage = "Card Number cannot be greater than 15 digits")]

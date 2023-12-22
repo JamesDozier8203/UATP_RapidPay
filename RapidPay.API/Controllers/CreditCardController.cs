@@ -24,16 +24,19 @@ public class CreditCardController : BaseController
     private readonly IMapper _mapper;
     private readonly ICardSecurity _cardSecurity;
     private readonly AppSettings _appSettings;
+    private readonly UFESingleton _uFESingleton;
 
     public CreditCardController(IUnitOfWork unitOfWork,
                                 IMapper mapper,
                                 ICardSecurity cardSecurity, 
-                                IOptions<AppSettings> appSettings)
+                                IOptions<AppSettings> appSettings,
+                                UFESingleton uFESingleton)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _cardSecurity = cardSecurity;
         _appSettings = appSettings.Value;
+        _uFESingleton = uFESingleton;
     }
 
     [AllowAnonymous]
@@ -190,13 +193,18 @@ public class CreditCardController : BaseController
         if (!_cardSecurity.IsFundsAvailable(creditCard.CardNumber, transactionModel.Amount))
             return BadRequest(new { message = "Insufficient Funds!" });
 
+        //calculate fee amount
+        decimal feeAmount = _uFESingleton.CalculateUFEPrice(transactionModel.Amount);
+        _ = decimal.Round(feeAmount, 2, MidpointRounding.AwayFromZero);
+
         //pay to account. create payment transaction
         var transaction = _mapper.Map<Transaction>(transactionModel);
+        transaction.Amount += feeAmount;
         await _unitOfWork.TransactionRepository.InsertAsync(transaction);
 
         //deduct from account balance
         var creditCardUpdate = await _unitOfWork.CreditCardRepository.GetCardByCardNumber(creditCardModel.CardNumber);
-        creditCardUpdate.Balance = creditCardUpdate.Balance - transactionModel.Amount;
+        creditCardUpdate.Balance = creditCardUpdate.Balance - transaction.Amount;
         await _unitOfWork.CreditCardRepository.Update(creditCardUpdate, creditCardUpdate.Id);
 
         //commit all db transactions to the database

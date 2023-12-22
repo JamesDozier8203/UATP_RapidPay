@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 public class CreditCardBalanceModel
 {
-    [DataType("decimal(18,5)")]
+    [DataType("decimal(18,2)")]
     public decimal Balance { get; set; } = 0;
 
     [Required(ErrorMessage = "Card Number is required!")]
